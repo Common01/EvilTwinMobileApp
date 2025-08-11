@@ -3,7 +3,7 @@ const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 
 const app = express();
-const port = 3000;
+let port = process.env.PORT || 3000;
 
 
 // Middleware
