@@ -11,10 +11,10 @@ app.use(express.json());
 
 // MySQL connection
 const connection = mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',   // ใช้ environment variable
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '1234',
-    database: process.env.DB_NAME || 'blueteam'
+    host: process.env.DB_HOST,   // ใช้ environment variable
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME 
 });
 
 connection.connect((err) => {
