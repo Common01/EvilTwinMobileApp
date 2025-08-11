@@ -1,20 +1,20 @@
 const express = require('express');
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
+require('dotenv').config(); // โหลด .env ถ้ามี
 
 const app = express();
-let port = process.env.PORT || 3000;
-
+const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
 
 // MySQL connection
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '1234',
-    database: 'blueteam'
+    host: process.env.DB_HOST || 'localhost',   // ใช้ environment variable
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '1234',
+    database: process.env.DB_NAME || 'blueteam'
 });
 
 connection.connect((err) => {
@@ -23,6 +23,11 @@ connection.connect((err) => {
         return;
     }
     console.log("Connected to MySQL");
+});
+
+// ✅ Route สำหรับเช็คสถานะ
+app.get('/', (req, res) => {
+    res.send('🚀 Server is running!');
 });
 
 // GET all users
@@ -38,7 +43,7 @@ app.get('/api/users', (req, res) => {
     });
 });
 
-// POST a new user
+// POST a new user (สำหรับ admin เพิ่มผู้ใช้)
 app.post('/api/users', async (req, res) => {
     const { username, email, passwords, descriptions, image, roles } = req.body;
 
@@ -47,9 +52,7 @@ app.post('/api/users', async (req, res) => {
     }
 
     try {
-        // 🔐 Hash the password
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(passwords, saltRounds);
+        const hashedPassword = await bcrypt.hash(passwords, 10);
 
         const query = `
             INSERT INTO users (username, email, passwords, descriptions, image, roles)
@@ -61,7 +64,7 @@ app.post('/api/users', async (req, res) => {
             [username, email, hashedPassword, descriptions, image, roles],
             (err, result) => {
                 if (err) {
-                    console.error("Error inserting user: ", err);
+                    console.error("Error inserting user:", err);
                     return res.status(500).json({ error: "Internal Server Error" });
                 }
 
@@ -77,33 +80,39 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
-//register
-app.post('/api/register', (req, res) => {
+// ✅ Register route
+app.post('/api/register', async (req, res) => {
     const { username, email, passwords } = req.body;
-    const roles = "User"; // ตั้งค่าค่า roles ตายตัว
+    const roles = "User";
 
     if (!username || !email || !passwords) {
         return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const query = `
-        INSERT INTO users (username, email, passwords, roles)
-        VALUES (?, ?, ?, ?)
-    `;
+    try {
+        const hashedPassword = await bcrypt.hash(passwords, 10);
 
-    connection.query(query, [username, email, passwords, roles], (err, results) => {
-        if (err) {
-            console.error("Error inserting user:", err);
-            return res.status(500).json({ error: "Internal Server Error" });
-        }
+        const query = `
+            INSERT INTO users (username, email, passwords, roles)
+            VALUES (?, ?, ?, ?)
+        `;
 
-        res.status(201).json({
-            message: "User registered successfully",
-            insertedId: results.insertId
+        connection.query(query, [username, email, hashedPassword, roles], (err, results) => {
+            if (err) {
+                console.error("Error inserting user:", err);
+                return res.status(500).json({ error: "Internal Server Error" });
+            }
+
+            res.status(201).json({
+                message: "User registered successfully",
+                insertedId: results.insertId
+            });
         });
-    });
+    } catch (err) {
+        console.error("Error hashing password:", err);
+        res.status(500).json({ error: "Failed to hash password" });
+    }
 });
-
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
