@@ -30,7 +30,8 @@ class _RegisterPageState extends State<RegisterPage> {
       passwords: _passwordController.text,
     );
 
-    final url = Uri.parse('http://localhost:3000/api/register'); // เปลี่ยนเป็น IP จริงเวลาใช้งาน
+    // ✅ เปลี่ยนเป็น Render URL (อย่าลืมเปิด CORS ที่ backend)
+    final url = Uri.parse('https://eviltwinmobileapp.onrender.com/api/register');
 
     try {
       final response = await http.post(
@@ -41,7 +42,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('สมัครสมาชิกสำเร็จ')),
+          const SnackBar(content: Text('สมัครสมาชิกสำเร็จ')),
         );
         Navigator.pushReplacement(
           context,
