@@ -6,6 +6,9 @@ require('dotenv').config(); // โหลด .env ถ้ามี
 const app = express();
 const port = process.env.PORT || 3000;
 
+const cors = require('cors');
+app.use(cors());
+
 // Middleware
 app.use(express.json());
 

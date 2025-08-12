@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/release
 
 .env
+index.json
+package-lock.json
+package.json

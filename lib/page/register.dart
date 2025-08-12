@@ -54,6 +54,7 @@ class _RegisterPageState extends State<RegisterPage> {
         );
       }
     } catch (e) {
+      print('❌ เกิดข้อผิดพลาด: $e'); // <-- ✅ log นี้สำคัญสุด
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
       );
