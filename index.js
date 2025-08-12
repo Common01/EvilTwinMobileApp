@@ -14,18 +14,19 @@ app.use(express.json());
 
 // MySQL connection
 const connection = mysql.createConnection({
-    host: process.env.DB_HOST,   // ใช้ environment variable
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME 
+  host: process.env.DB_HOST, // public IP หรือ hostname
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  connectTimeout: 10000, // เพิ่ม timeout หากจำเป็น
 });
 
 connection.connect((err) => {
-    if (err) {
-        console.error("MySQL connection error:", err);
-        return;
-    }
-    console.log("Connected to MySQL");
+  if (err) {
+    console.error("MySQL connection error:", err);
+    return;
+  }
+  console.log("✅ Connected to MySQL");
 });
 
 // ✅ Route สำหรับเช็คสถานะ
