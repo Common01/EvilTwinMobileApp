@@ -85,38 +85,35 @@ app.post('/api/users', async (req, res) => {
 });
 
 // ✅ Register route
-app.post('/api/register', async (req, res) => {
+app.post('/api/register', (req, res) => {
+    console.log("📥 Register Request Body:", req.body);
+
     const { username, email, passwords } = req.body;
     const roles = "User";
 
     if (!username || !email || !passwords) {
+        console.log("❌ Missing fields");
         return res.status(400).json({ error: "Missing required fields" });
     }
 
-    try {
-        const hashedPassword = await bcrypt.hash(passwords, 10);
+    const query = `
+        INSERT INTO users (username, email, passwords, roles)
+        VALUES (?, ?, ?, ?)
+    `;
 
-        const query = `
-            INSERT INTO users (username, email, passwords, roles)
-            VALUES (?, ?, ?, ?)
-        `;
+    connection.query(query, [username, email, passwords, roles], (err, results) => {
+        if (err) {
+            console.error("❌ Error inserting user:", err);
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
 
-        connection.query(query, [username, email, hashedPassword, roles], (err, results) => {
-            if (err) {
-                console.error("Error inserting user:", err);
-                return res.status(500).json({ error: "Internal Server Error" });
-            }
-
-            res.status(201).json({
-                message: "User registered successfully",
-                insertedId: results.insertId
-            });
+        res.status(201).json({
+            message: "User registered successfully",
+            insertedId: results.insertId
         });
-    } catch (err) {
-        console.error("Error hashing password:", err);
-        res.status(500).json({ error: "Failed to hash password" });
-    }
+    });
 });
+
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
