@@ -30,8 +30,7 @@ class _RegisterPageState extends State<RegisterPage> {
       passwords: _passwordController.text,
     );
 
-    // ✅ เปลี่ยนเป็น Render URL (อย่าลืมเปิด CORS ที่ backend)
-    final url = Uri.parse('https://eviltwinmobileapp.onrender.com/api/register');
+    final url = Uri.parse('http://10.0.2.2:3000/api/register');  // <-- แก้ตรงนี้
 
     try {
       final response = await http.post(
@@ -54,7 +53,7 @@ class _RegisterPageState extends State<RegisterPage> {
         );
       }
     } catch (e) {
-      print('❌ เกิดข้อผิดพลาด: $e'); // <-- ✅ log นี้สำคัญสุด
+      print('❌ เกิดข้อผิดพลาด: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
       );

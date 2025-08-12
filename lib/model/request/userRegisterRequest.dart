@@ -1,23 +1,33 @@
+// To parse this JSON data, do
+//
+//     final userRegisterRequest = userRegisterRequestFromJson(jsonString);
+
 import 'dart:convert';
 
+UserRegisterRequest userRegisterRequestFromJson(String str) => UserRegisterRequest.fromJson(json.decode(str));
+
+String userRegisterRequestToJson(UserRegisterRequest data) => json.encode(data.toJson());
+
 class UserRegisterRequest {
-  final String username;
-  final String email;
-  final String passwords;
+    String username;
+    String email;
+    String passwords;
 
-  UserRegisterRequest({
-    required this.username,
-    required this.email,
-    required this.passwords,
-  });
+    UserRegisterRequest({
+        required this.username,
+        required this.email,
+        required this.passwords,
+    });
 
-  Map<String, dynamic> toJson() => {
-        'username': username,
-        'email': email,
-        'passwords': passwords,
-      };
-}
+    factory UserRegisterRequest.fromJson(Map<String, dynamic> json) => UserRegisterRequest(
+        username: json["username"],
+        email: json["email"],
+        passwords: json["passwords"],
+    );
 
-String userRegisterRequestToJson(UserRegisterRequest data) {
-  return json.encode(data.toJson());
+    Map<String, dynamic> toJson() => {
+        "username": username,
+        "email": email,
+        "passwords": passwords,
+    };
 }
